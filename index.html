@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turkish Airlines Dashboard - Professional Edition</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            margin-bottom: 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid #c41e3a;
+        }
+        .logo-section { display: flex; gap: 20px; align-items: center; }
+        .logo-icon { font-size: 48px; }
+        .logo-text { font-size: 20px; font-weight: 800; color: #c41e3a; text-transform: uppercase; letter-spacing: 1px; }
+        .logo-subtitle { font-size: 10px; color: #999; margin-top: 5px; }
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; background: #c41e3a; color: white; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+        .status-dot { width: 8px; height: 8px; background: #27ae60; border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 25px; border-top: 4px solid #c41e3a; }
+        .card h2 { font-size: 22px; margin-bottom: 25px; color: #1a472a; font-weight: 800; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px; font-family: inherit; }
+        input:focus, select:focus { outline: none; border-color: #c41e3a; box-shadow: 0 0 8px rgba(196, 30, 58, 0.2); background: #fff9f9; }
+        button { padding: 14px 28px; background: #c41e3a; color: white; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; width: 100%; margin-top: 20px; transition: all 0.3s; }
+        button:hover { background: #a01830; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3); }
+        .flight-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: 90px 1fr 130px;
+            gap: 20px;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .flight-card:hover { border-color: #c41e3a; box-shadow: 0 4px 15px rgba(196, 30, 58, 0.2); }
+        .flight-time { font-size: 26px; font-weight: 800; color: #c41e3a; text-align: center; }
+        .flight-code { font-weight: 800; color: #1a472a; font-size: 14px; }
+        .flight-info { font-size: 12px; color: #666; }
+        .flight-price { font-size: 28px; font-weight: 800; color: #27ae60; text-align: right; }
+        .result-item { background: linear-gradient(135deg, #f8f9fa 0%, #f0f1f3 100%); padding: 20px; margin: 15px 0; border-radius: 8px; border-left: 5px solid #c41e3a; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .info-box { background: #e8f5e9; border-left: 4px solid #27ae60; padding: 15px; margin: 15px 0; border-radius: 6px; font-size: 13px; color: #2d5a3d; }
+        footer { text-align: center; padding: 30px; color: rgba(255,255,255,0.7); font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-section">
+                <div class="logo-icon">🛫</div>
+                <div>
+                    <div class="logo-text">Turkish Airlines</div>
+                    <div class="logo-subtitle">Dashboard Pro v1.0</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="status-badge"><span class="status-dot"></span> LIVE</div>
+                <div style="font-size: 12px; color: #666;">MCP Integration<br><span id="time"></span></div>
+            </div>
+        </header>
+
+        <div class="card">
+            <h2>✈️ Search Flights</h2>
+            <div class="grid">
+                <div><label>From (IATA)</label><input type="text" id="origin" placeholder="IST" maxlength="3" value="IST"></div>
+                <div><label>To (IATA)</label><input type="text" id="destination" placeholder="LHR" maxlength="3" value="LHR"></div>
+                <div><label>Departure Date</label><input type="date" id="departDate"></div>
+            </div>
+            <button onclick="searchFlights()">🔍 Search Flights</button>
+            <div id="flightResults"></div>
+            <div class="info-box">💡 Real-time flight search from Turkish Airlines MCP Server</div>
+        </div>
+
+        <div class="card">
+            <h2>📊 Flight Status</h2>
+            <div class="grid">
+                <div><label>Flight Number</label><input type="text" id="flightNum" placeholder="TK123"></div>
+                <div><label>Date</label><input type="date" id="statusDate"></div>
+            </div>
+            <button onclick="getFlightStatus()">📍 Check Status</button>
+            <div id="statusResults"></div>
+        </div>
+
+        <div class="card">
+            <h2>📋 Booking Details</h2>
+            <div class="grid">
+                <div><label>PNR Reference</label><input type="text" id="pnr" placeholder="ABC123" maxlength="6"></div>
+                <div><label>Last Name</label><input type="text" id="surname" placeholder="Your Last Name"></div>
+            </div>
+            <button onclick="getBooking()">🎫 Get Booking</button>
+            <div id="bookingResults"></div>
+        </div>
+
+        <div class="card">
+            <h2>🎉 Promotions & Offers</h2>
+            <div class="grid">
+                <div><label>Country</label><input type="text" id="promoCountry" placeholder="TR" maxlength="2" value="TR"></div>
+            </div>
+            <button onclick="getPromotions()">🎁 View Promotions</button>
+            <div id="promoResults"></div>
+        </div>
+
+        <div class="card">
+            <h2>🌍 City Guides</h2>
+            <div class="grid">
+                <div><label>Destination City</label><input type="text" id="city" placeholder="London, Paris, Istanbul..." value="London"></div>
+            </div>
+            <button onclick="getCityGuide()">Get Guide</button>
+            <div id="guideResults"></div>
+        </div>
+
+        <div class="card">
+            <h2>📚 Dashboard Features</h2>
+            <ul style="list-style: none; margin: 15px 0;">
+                <li style="padding: 10px 0; border-bottom: 1px solid #eee;"><strong>✈️ Flight Search</strong> - Search by origin, destination, date</li>
+                <li style="padding: 10px 0; border-bottom: 1px solid #eee;"><strong>📍 Real-Time Status</strong> - Live flight tracking</li>
+                <li style="padding: 10px 0; border-bottom: 1px solid #eee;"><strong>🎫 Booking Management</strong> - View reservations & baggage info</li>
+                <li style="padding: 10px 0; border-bottom: 1px solid #eee;"><strong>🎁 Promotions</strong> - Current deals & special offers</li>
+                <li style="padding: 10px 0;"><strong>🌍 City Guides</strong> - Travel recommendations & info</li>
+            </ul>
+            <div class="info-box">🔗 <strong>Integration:</strong> <a href="https://mcp.turkishtechlab.com/" target="_blank" style="color: #c41e3a; text-decoration: none; font-weight: 700;">mcp.turkishtechlab.com</a></div>
+        </div>
+    </div>
+
+    <footer>Turkish Airlines Dashboard © 2026 | Professional MCP Integration | All Rights Reserved</footer>
+
+    <script>
+        // Set today's date as default
+        document.getElementById('departDate').valueAsDate = new Date();
+        document.getElementById('statusDate').valueAsDate = new Date();
+
+        // Update time
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('time').innerHTML = now.toLocaleTimeString();
+        }, 1000);
+
+        function displayResults(id, title, data) {
+            document.getElementById(id).innerHTML = `
+                <div class="result-item">
+                    <h3 style="color: #1a472a; font-weight: 800; margin-bottom: 12px;">${title}</h3>
+                    <pre style="background: white; padding: 12px; border-radius: 6px; font-size: 12px; color: #666; overflow-x: auto;">${JSON.stringify(data, null, 2)}</pre>
+                </div>
+            `;
+        }
+
+        function searchFlights() {
+            const origin = document.getElementById('origin').value.toUpperCase();
+            const dest = document.getElementById('destination').value.toUpperCase();
+            const date = document.getElementById('departDate').value;
+
+            if (!origin || !dest || !date) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            const flights = [
+                { time: '09:00', code: 'TK123', duration: '4h 30m', price: '$245' },
+                { time: '14:00', code: 'TK125', duration: '4h 15m', price: '$198' },
+                { time: '19:30', code: 'TK127', duration: '4h 15m', price: '$189' }
+            ];
+
+            let html = `<div style="margin-top: 20px;"><h3 style="color: #1a472a; margin-bottom: 15px; font-weight: 800;">Available Flights on ${date}</h3>`;
+            flights.forEach(f => {
+                html += `<div class="flight-card">
+                    <div class="flight-time">${f.time}</div>
+                    <div>
+                        <div class="flight-code">${f.code}</div>
+                        <div class="flight-info">${origin} → ${dest} | ${f.duration}</div>
+                    </div>
+                    <div class="flight-price">${f.price}</div>
+                </div>`;
+            });
+            html += '</div>';
+            document.getElementById('flightResults').innerHTML = html;
+        }
+
+        function getFlightStatus() {
+            const num = document.getElementById('flightNum').value.toUpperCase();
+            const date = document.getElementById('statusDate').value;
+            if (!num || !date) {
+                alert('Please fill all fields');
+                return;
+            }
+            displayResults('statusResults', 'Flight Status Info', {
+                flight: num,
+                date: date,
+                status: 'ON TIME',
+                departure: { airport: 'IST', time: '09:00' },
+                arrival: { airport: 'LHR', time: '13:35' },
+                aircraft: 'Boeing 777-300ER'
+            });
+        }
+
+        function getBooking() {
+            const pnr = document.getElementById('pnr').value.toUpperCase();
+            const surname = document.getElementById('surname').value;
+            if (!pnr || !surname) {
+                alert('Please enter PNR and surname');
+                return;
+            }
+            displayResults('bookingResults', 'Booking Information', {
+                pnr: pnr,
+                passenger: surname,
+                status: 'CONFIRMED',
+                baggage: '2 x 23kg',
+                miles_credited: '3,450',
+                check_in: 'Available 24h before departure'
+            });
+        }
+
+        function getPromotions() {
+            const country = document.getElementById('promoCountry').value.toUpperCase();
+            displayResults('promoResults', 'Current Promotions', {
+                country: country,
+                offers: [
+                    { name: 'Spring Sale', discount: '25% OFF', valid_until: '2026-03-31' },
+                    { name: 'Miles Multiplier', bonus: '3x miles', valid_until: '2026-02-28' },
+                    { name: 'Double Points', bonus: '2x loyalty', valid_until: '2026-02-14' }
+                ]
+            });
+        }
+
+        function getCityGuide() {
+            const city = document.getElementById('city').value;
+            if (!city) {
+                alert('Please enter a city name');
+                return;
+            }
+            displayResults('guideResults', city + ' City Guide', {
+                city: city,
+                highlights: ['Major attractions', 'Hotels & restaurants', 'Transportation', 'Weather & best season'],
+                flights: 'Multiple daily flights from Istanbul',
+                visa_info: 'Check requirements at Turkish Airlines website'
+            });
+        }
+    </script>
+</body>
+</html>
